@@ -1,61 +1,77 @@
 /**
- * Central factory for building test records. Keeps @TestSetup blocks free of
- * inline record construction and provides consistent, reusable test data.
+ * Reusable test-data builders for Apex test classes. All methods are pure
+ * factory helpers; callers decide whether to insert the returned records.
  */
 @isTest
 public class TestDataFactory {
     /**
-     * Builds Accounts with a controllable Active__c flag.
+     * Builds (and optionally inserts) active Product2 records.
      *
-     * @param count Number of Accounts to build.
-     * @param isActive Value for the Account.Active__c checkbox.
-     * @param doInsert Whether to insert the records before returning them.
-     * @return The list of built (and optionally inserted) Accounts.
+     * @param count Number of products to create.
+     * @param doInsert Whether to insert the records before returning.
+     * @return The list of Product2 records.
      */
-    public static List<Account> createAccounts(Integer count, Boolean isActive, Boolean doInsert) {
-        List<Account> accounts = new List<Account>();
+    public static List<Product2> createProducts(Integer count, Boolean doInsert) {
+        List<Product2> products = new List<Product2>();
         for (Integer i = 0; i < count; i++) {
-            accounts.add(new Account(
-                Name = 'Test Account ' + i,
-                Active__c = isActive
+            products.add(new Product2(
+                Name = 'Test Product ' + i,
+                ProductCode = 'PC-' + i,
+                Family = 'Hardware',
+                IsActive = true
             ));
         }
         if (doInsert) {
-            insert accounts;
+            insert products;
         }
-        return accounts;
+        return products;
     }
 
     /**
-     * Builds Contacts linked to the supplied Account.
+     * Returns the Id of the org's standard Pricebook, safe for test context.
      *
-     * @param count Number of Contacts to build.
-     * @param accountId The parent Account for every Contact.
-     * @param doInsert Whether to insert the records before returning them.
-     * @return The list of built (and optionally inserted) Contacts.
+     * @return The standard Pricebook Id.
      */
-    public static List<Contact> createContacts(Integer count, Id accountId, Boolean doInsert) {
-        List<Contact> contacts = new List<Contact>();
-        for (Integer i = 0; i < count; i++) {
-            contacts.add(new Contact(
-                LastName = 'Tester ' + i,
-                Email = 'tester' + i + '@example.com',
-                Department = 'Sales',
-                AccountId = accountId
+    public static Id getStandardPricebookId() {
+        return Test.getStandardPricebookId();
+    }
+
+    /**
+     * Builds (and optionally inserts) active standard PricebookEntry records
+     * for the supplied products.
+     *
+     * @param products Products to price.
+     * @param unitPrice The standard unit price to assign.
+     * @param doInsert Whether to insert the records before returning.
+     * @return The list of PricebookEntry records.
+     */
+    public static List<PricebookEntry> createStandardPricebookEntries(
+        List<Product2> products,
+        Decimal unitPrice,
+        Boolean doInsert
+    ) {
+        Id standardPricebookId = getStandardPricebookId();
+        List<PricebookEntry> entries = new List<PricebookEntry>();
+        for (Product2 product : products) {
+            entries.add(new PricebookEntry(
+                Pricebook2Id = standardPricebookId,
+                Product2Id = product.Id,
+                UnitPrice = unitPrice,
+                IsActive = true
             ));
         }
         if (doInsert) {
-            insert contacts;
+            insert entries;
         }
-        return contacts;
+        return entries;
     }
 
     /**
-     * Builds Opportunities.
+     * Builds (and optionally inserts) Opportunity records.
      *
-     * @param count Number of Opportunities to build.
-     * @param doInsert Whether to insert the records before returning them.
-     * @return The list of built (and optionally inserted) Opportunities.
+     * @param count Number of opportunities to create.
+     * @param doInsert Whether to insert the records before returning.
+     * @return The list of Opportunity records.
      */
     public static List<Opportunity> createOpportunities(Integer count, Boolean doInsert) {
         List<Opportunity> opportunities = new List<Opportunity>();
