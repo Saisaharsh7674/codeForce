@@ -1,0 +1,75 @@
+{
+  "documents": [
+    {
+      "type": "rca",
+      "title": "RCA for INC4841815 (Account Merge Issue)",
+      "incident_id": "INC4841815",
+      "reported_date": "06/16/2026",
+      "issue_description": "(US) - MDM team reported Multiple Account AFDs did not move after MDM merge process in Engage.",
+      "impact": "The AFD from Non-Survivor are not moving to Survivor Account.",
+      "severity": "High",
+      "root_cause": "A race condition between Salesforce's internal merge-time reparenting of child records (AFDs) and the asynchronous execution of restoreAccountHelper.restoreAccountFromMerge (Future context).",
+      "what_happened": [
+        "When accounts are merged in MDM, in Engage AFDs are not getting reparented from Non-survivor to Survivor correctly.",
+        "Following completion of the MDM merge, AFD records remain linked to the non-survivor accounts."
+      ],
+      "why_it_happened": [
+        "restoreAccountHelper.cls runs in the After Delete context of the Account trigger.",
+        "A duplicate check is performed on KPMG_Account_Firm_Details__c (AFD) based on Member Firm Code.",
+        "If a duplicate AFD is found on the survivor account, the logic reparents it back to the non-survivor account."
+      ],
+      "summary": [
+        "In UAT the duplicate-check logic executes before Salesforce reparents the AFD records.",
+        "In PROD Salesforce reparents the AFD records before the duplicate-check logic executes, so they are incorrectly treated as duplicates."
+      ],
+      "proposed_solution": [
+        "Restructure the duplicate validation so it executes only after Salesforce has completed reparenting child records.",
+        "Reparent only the duplicate AFD that originated from the non-survivor account back to the archived non-survivor account."
+      ],
+      "expected_outcome": [
+        "Merge behavior remains consistent across UAT and PROD regardless of Salesforce internal reparenting timing."
+      ]
+    },
+    {
+      "type": "solution",
+      "jira": "GEE-65247",
+      "title": "Users are unable to submit OTM removal requests when an automated notification is sent from their unverified email domain.",
+      "description": "In KPMG Engage, when a user attempts to remove an Opportunity Team Member (OTM) from an Opportunity, the flow \"OpportunityTeamApprovalwithCase Flow\" fails during execution when the user's email domain is not verified.",
+      "expected_result": "The Case to request the Team Member removal should be created and notifications sent successfully.",
+      "actual_result": "The Flow fails with: We can't send your email because your email address domain isn't verified. No OTM request Case is created.",
+      "business_impact": "none, this is purely a code fix that has no other effect than to fix the issue described.",
+      "root_cause": "The OTM Removal Alert action is missing the senderType and senderAddress parameters, so Salesforce defaults to the running user's email address, which fails when their domain is not verified.",
+      "resolution": [
+        "Added senderType and senderAddress parameters to the OTM_Removal_Alert action so Salesforce sends the email using an Org-Wide Email Address instead of the running user's email."
+      ],
+      "solution_items": [
+        {"status": "Existing", "name": "OpportunityTeamApprovalwithCase - Flow", "change": "Added senderType and senderAddress parameters to OTM_Removal_Alert action."}
+      ],
+      "changes": [
+        "OpportunityTeamApprovalwithCase - FLOW: added Org-Wide Email Address sender configuration to the OTM_Removal_Alert action."
+      ],
+      "impact_brief": "No Impacts",
+      "components_impacted": [
+        "OpportunityTeamApprovalwithCase - Flow"
+      ]
+    },
+    {
+      "type": "impact",
+      "jira": "GEE-65247",
+      "title": "Users are unable to submit OTM removal requests when an automated notification is sent from their unverified email domain.",
+      "developer": "Yashmeen Kaur",
+      "reviewer": "Sandip Singh",
+      "prepared_by": "Yashmeen Kaur",
+      "date": "9th July, 2026",
+      "brief_description": "In KPMG Engage, the flow \"OpportunityTeamApprovalwithCase Flow\" fails during execution when the user's email domain is not verified.",
+      "executive_summary": "Added senderType and senderAddress parameters to the OTM_Removal_Alert action so Salesforce sends the email using an Org-Wide Email Address instead of the running user's email.",
+      "scope": "There will be no downstream impact on any system with these changes.",
+      "components": [
+        {"name": "OpportunityTeamApprovalwithCase", "type": "Flow", "impact": "Update"}
+      ],
+      "profiles": {},
+      "permission_sets": [],
+      "integrations": {}
+    }
+  ]
+}

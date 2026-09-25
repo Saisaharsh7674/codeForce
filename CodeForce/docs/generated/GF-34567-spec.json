@@ -1,0 +1,36 @@
+{
+  "type": "impact",
+  "id": "GF-34567",
+  "title": "Impact Analysis – GF-34567: Active-Account Contacts to Opportunity Contact Roles LWC",
+  "developer": "Sanika K",
+  "reviewer": "GeddiViswanathan",
+  "date": "2026-09-24",
+  "brief_description": "Build a Lightning Web Component that lists Contacts of Active Accounts and lets a user assign selected Contacts as Opportunity Contact Roles from the Opportunity record page.",
+  "executive_summary": "Introduces a new LWC on the Opportunity record page that displays a paginated (5/page), multi-select table of Contacts belonging to Active Accounts (Name as hyperlink, Email, Account Name, Department). Selected Contacts advance to a second table where the user assigns a standard Role; on Save the system creates OpportunityContactRole records for the current Opportunity and shows a success toast. Requires a new Account.Active__c checkbox, a supporting Apex controller (query + DML), and its test class.",
+  "scope": "There will be no downstream impact on any system with these changes.",
+  "components": [
+    {
+      "name": "Account.Active__c",
+      "metadata_type": "Custom Field",
+      "description": "New Checkbox field on Account defining an 'Active' Account. Contacts are filtered on Account.Active__c = true. Net-new at objects/Account/fields/Active__c.field-meta.xml."
+    },
+    {
+      "name": "OpportunityContactRoleController",
+      "metadata_type": "Apex Class",
+      "description": "Server controller. getActiveAccountContacts() returns Contacts (Name, Email, Account.Name, Department) whose Account.Active__c = true; createContactRoles(opportunityId, contactIds, role) inserts OpportunityContactRole records for the current Opportunity."
+    },
+    {
+      "name": "OpportunityContactRoleControllerTest",
+      "metadata_type": "Apex Class",
+      "description": "Apex test class providing coverage for the controller query and DML paths (deploy requirement)."
+    },
+    {
+      "name": "contactOpportunityRoleManager",
+      "metadata_type": "Lightning Web Component",
+      "description": "Two-step UI exposed to lightning__RecordPage (Opportunity). Step 1: paginated (5/page), multi-select datatable of Active-Account Contacts with Contact Name as a hyperlink. Step 2 (after Next): table of selected Contacts with a standard OpportunityContactRole Role picker. On Save, creates OpportunityContactRole records using @api recordId as the OpportunityId and shows a success toast."
+    }
+  ],
+  "profiles": {},
+  "permission_sets": [],
+  "integrations": {}
+}

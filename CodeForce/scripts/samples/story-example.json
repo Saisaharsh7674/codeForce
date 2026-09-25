@@ -1,0 +1,34 @@
+{
+  "type": "impact",
+  "jira": "GF-50361",
+  "title": "Deploy the Introhive v5.53 managed package upgrade to implement new fields required for KPI dashboards.",
+  "developer": "Sai Saharsh",
+  "reviewer": "Sandip Singh K",
+  "prepared_by": "Sai Saharsh",
+  "date": "April 15 2026",
+  "brief_description": "Upgrade the Introhive package to version 5.53.1.",
+  "executive_summary": "Upgrade the Introhive package to version 5.53.1.",
+  "scope": "There is no impact in downstream systems and no impact to the functionality in Engage.",
+  "components": [
+    {"name": "Introhive Managed Package", "type": "Managed Package", "impact": "Upgrade"}
+  ],
+  "profiles": {
+    "Ownbackup User": "Y",
+    "Glass Breaker Profile": "Y",
+    "Integration User": "Y",
+    "System Administrator": "Y"
+  },
+  "permission_sets": [
+    "KPMG Sales L, M, S",
+    "Marketing User L, M, S",
+    "Data Steward L, M, S",
+    "Introhive Integration User",
+    "ADL_Integration",
+    "Cvent_Integration_User",
+    "Demandbase_Permission_Set"
+  ],
+  "integrations": {
+    "ADL": {"impacted": "N", "signoff": "N"},
+    "Mule Soft": {"impacted": "N", "signoff": "N"}
+  }
+}

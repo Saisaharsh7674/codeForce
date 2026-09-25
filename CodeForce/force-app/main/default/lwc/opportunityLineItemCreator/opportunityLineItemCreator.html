@@ -1,0 +1,84 @@
+<template>
+    <lightning-card title="Create Opportunity Line Items" icon-name="standard:opportunity">
+        <div class="slds-p-horizontal_medium">
+            <template lwc:if={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+
+            <template lwc:if={errorMessage}>
+                <div class="slds-text-color_error slds-p-vertical_x-small" role="alert">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <!-- Step 1: Product selection -->
+            <template lwc:if={showDetailStep}>
+                <div class="slds-m-bottom_small">
+                    <p class="slds-text-body_small slds-m-bottom_x-small">
+                        Enter Quantity and Sales Price for each selected product, then Save.
+                    </p>
+                    <lightning-datatable
+                        key-field="id"
+                        data={detailRows}
+                        columns={detailColumns}
+                        draft-values={draftValues}
+                        hide-checkbox-column
+                        oncellchange={handleCellChange}
+                    ></lightning-datatable>
+                </div>
+                <div class="slds-grid slds-grid_align-spread slds-m-top_small">
+                    <lightning-button label="Back" onclick={handleBack}></lightning-button>
+                    <lightning-button
+                        label="Save"
+                        variant="brand"
+                        onclick={handleSave}
+                    ></lightning-button>
+                </div>
+            </template>
+
+            <!-- Step 2: Line item details -->
+            <template lwc:else>
+                <template lwc:if={hasProducts}>
+                    <lightning-datatable
+                        key-field="productId"
+                        data={pagedProducts}
+                        columns={productColumns}
+                        selected-rows={selectedRowsForPage}
+                        onrowselection={handleRowSelection}
+                    ></lightning-datatable>
+
+                    <div class="slds-grid slds-grid_align-spread slds-m-top_small slds-p-vertical_x-small">
+                        <lightning-button
+                            label="Previous"
+                            onclick={handlePrevious}
+                            disabled={isFirstPage}
+                        ></lightning-button>
+                        <span class="slds-align-middle">{pageInfo}</span>
+                        <lightning-button
+                            label="Next Page"
+                            onclick={handleNext}
+                            disabled={isLastPage}
+                        ></lightning-button>
+                    </div>
+
+                    <div class="slds-grid slds-grid_align-end slds-m-top_small">
+                        <lightning-button
+                            label="Next"
+                            variant="brand"
+                            onclick={handleProceed}
+                            disabled={hasNoSelection}
+                            class="proceed-button"
+                        ></lightning-button>
+                    </div>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={isLoading}>
+                    </template>
+                    <template lwc:else>
+                        <p class="slds-p-vertical_small">No products are available.</p>
+                    </template>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>
