@@ -87,4 +87,50 @@ public class TestDataFactory {
         }
         return opportunities;
     }
+
+    /**
+     * Builds Accounts with a controllable Active__c flag.
+     *
+     * @param count Number of Accounts to build.
+     * @param isActive Value for the Account.Active__c checkbox.
+     * @param doInsert Whether to insert the records before returning them.
+     * @return The list of built (and optionally inserted) Accounts.
+     */
+    public static List<Account> createAccounts(Integer count, Boolean isActive, Boolean doInsert) {
+        List<Account> accounts = new List<Account>();
+        for (Integer i = 0; i < count; i++) {
+            accounts.add(new Account(
+                Name = 'Test Account ' + i,
+                Active__c = isActive
+            ));
+        }
+        if (doInsert) {
+            insert accounts;
+        }
+        return accounts;
+    }
+
+    /**
+     * Builds Contacts linked to the supplied Account.
+     *
+     * @param count Number of Contacts to build.
+     * @param accountId The parent Account for every Contact.
+     * @param doInsert Whether to insert the records before returning them.
+     * @return The list of built (and optionally inserted) Contacts.
+     */
+    public static List<Contact> createContacts(Integer count, Id accountId, Boolean doInsert) {
+        List<Contact> contacts = new List<Contact>();
+        for (Integer i = 0; i < count; i++) {
+            contacts.add(new Contact(
+                LastName = 'Tester ' + i,
+                Email = 'tester' + i + '@example.com',
+                Department = 'Sales',
+                AccountId = accountId
+            ));
+        }
+        if (doInsert) {
+            insert contacts;
+        }
+        return contacts;
+    }
 }
